@@ -435,6 +435,33 @@ Calculating the Fibonacci sequence using a naive recursive approach.  | Linear |
 >
 > **Divide by 2 → log n**
 >
+  > Key line that decides the time complexity 🔑
+  >
+  > `exp //= 2` or `>> 1`
+  >
+  > `x >> 1 == x // 2 (for non-negative integers)`
+  >
+  > ⚠️ Important distinction
+  >
+    >>
+    `>> 1` by itself → O(1) (single CPU operation)
+
+    `>> 1` inside a loop that shrinks n → O(log n) ✅
+  >
+  > **General rule (MEMORIZE THIS)**
+  >
+  > If a loop divides the input by a constant factor (2, 3, etc.) each iteration, the time complexity is O(log n).
+  >
+  > **Visual intuition 🧠**
+  >
+  > `O(n) loop`
+  >
+  > `16 → 15 → 14 → ... → 1   (16 steps)`
+  >
+  > `O(log n) loop`
+  >
+  > `16 → 8 → 4 → 2 → 1       (5 steps)`
+>
 > **Sort → n log n**
 >
 > **Branching recursion → exponential**
@@ -464,3 +491,158 @@ Ask yourself:
 6. **What dominates for large `n`?**
 7. **Is this worst-case, average-case, or best-case?**
 8. **Is space used by recursion or auxiliary storage?**
+
+
+
+
+
+# Bitwise Operator Notes
+
+### Example 1: `20 >> 1`
+
+* Decimal `20` → Binary `10100`
+* Shift **right by 1**:
+
+```text
+Original: 1 0 1 0 0
+Shift >>1: 0 1 0 1 0
+```
+
+* Convert back to decimal: `01010 = 10` ✅
+
+---
+
+### Example 2: `20 >> 2`
+
+* Decimal `20` → Binary `10100`
+* Shift **right by 2**:
+
+```text
+Original: 1 0 1 0 0
+Shift >>2: 0 0 1 0 1
+```
+
+* Convert back to decimal: `00101 = 5` ✅
+
+---
+
+### Key rules
+
+1. **All bits are shifted right** by `k` positions.
+2. **Rightmost `k` bits are dropped**.
+3. **Zeros are added on the left** (for non-negative numbers).
+4. Formula:
+
+[
+x >> k = x // 2^k
+]
+
+---
+
+### Visual check:
+
+| Operation | Binary | Decimal |
+| --------- | ------ | ------- |
+| `20 >> 1` | 01010  | 10      |
+| `20 >> 2` | 00101  | 5       |
+
+---
+
+So your explanation:
+
+> "x >> k shifts ALL bits to the RIGHT by k positions … last k bits dropped … zeros added on left"
+
+✅ is **perfectly correct**.
+
+---
+
+## The expression:
+
+```python
+(n & 1) == 1
+```
+
+* `&` is the **bitwise AND** operator.
+* `1` in binary is:
+
+```text
+1 = 000...0001
+```
+
+---
+
+## Step 1: Why this works
+
+### Key idea:
+
+* The **least significant bit (LSB)** of a binary number tells us if it’s odd or even.
+
+  * If LSB = 0 → **even**
+  * If LSB = 1 → **odd**
+
+Examples:
+
+| Decimal | Binary | LSB | Odd/Even |
+| ------- | ------ | --- | -------- |
+| 4       | 100    | 0   | Even     |
+| 7       | 111    | 1   | Odd      |
+| 20      | 10100  | 0   | Even     |
+| 13      | 1101   | 1   | Odd      |
+
+---
+
+## Step 2: Bitwise AND with 1
+
+When you do:
+
+```python
+n & 1
+```
+
+* Only the **last bit** matters, because `1 = 0001` in binary.
+* Effectively:
+
+```text
+n & 1 = last_bit_of_n
+```
+
+---
+
+### Example 1: n = 7
+
+```text
+7   = 0111
+1   = 0001
+7&1 = 0001  → 1 → Odd
+```
+
+### Example 2: n = 20
+
+```text
+20  = 10100
+1   = 00001
+20&1 = 00000 → 0 → Even
+```
+
+---
+
+## Step 3: Compare with 1
+
+```python
+(n & 1) == 1
+```
+
+* True → odd number
+* False → even number
+
+✅ Works for all non-negative integers.
+
+---
+
+## Step 4: Why it’s better than `%2`
+
+* `%2` → division + modulo → slightly slower
+* `&1` → pure bitwise → very fast at CPU level
+* This is why it’s a common **interview trick**.
+
+---
